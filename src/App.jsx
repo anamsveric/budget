@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Card from './components/Card'
 import SubSection from './components/SubSection'
 import InputRow from './components/InputRow'
+import { getTrosak, saveTrosak } from './api'
 
 const STORAGE_KEY = 'troskovi_all'
 
@@ -56,19 +57,50 @@ function fmt(val) {
 
 export default function App() {
   const [period, setPeriod] = useState(todayPeriod)
-
   const [allData, setAllData] = useState(() => {
     try {
       const s = localStorage.getItem(STORAGE_KEY)
       return s ? JSON.parse(s) : {}
-    } catch {
-      return {}
-    }
+    } catch { return {} }
   })
+  const [syncing, setSyncing] = useState(false)
+  const saveTimer = useRef(null)
 
+  // Učitaj podatke iz Strapi kad se promijeni period
+  useEffect(() => {
+    getTrosak(period).then(data => {
+      if (data) {
+        setAllData(prev => ({ ...prev, [period]: data }))
+      }
+    }).catch(() => {}) // fallback na localStorage ako Strapi nije dostupan
+  }, [period])
+
+  // Spremi u localStorage odmah
   useEffect(() => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(allData))
   }, [allData])
+
+  // Spremi u Strapi s debounceom (1.5s) kad se mijenja unos
+  const syncToStrapi = useCallback((p, data) => {
+    if (!data || !Object.values(data).some(v => v !== '' && v !== 0 && v !== null)) return
+    setSyncing(true)
+    saveTrosak(p, data).finally(() => setSyncing(false))
+  }, [])
+
+  useEffect(() => {
+    clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => {
+      syncToStrapi(period, allData[period])
+    }, 1500)
+    return () => clearTimeout(saveTimer.current)
+  }, [allData, period, syncToStrapi])
+
+  // Spremi odmah kad se mijenja period (ne čekaj debounce)
+  const handlePeriodChange = useCallback((newPeriod) => {
+    clearTimeout(saveTimer.current)
+    syncToStrapi(period, allData[period])
+    setPeriod(newPeriod)
+  }, [period, allData, syncToStrapi])
 
   const v = { ...INIT, ...(allData[period] || {}) }
 
@@ -132,6 +164,7 @@ export default function App() {
           {/* Gornji red: naslov + resetiraj */}
           <div className="flex items-center justify-between mb-2 sm:mb-0">
             <h1 className="text-base sm:text-lg font-bold text-gray-900">Praćenje troškova</h1>
+            <p className="text-xs mt-0.5 text-gray-400">{syncing ? '⏳ Spremanje...' : '✓ Spremljeno'}</p>
             <button
               onClick={resetMonth}
               className="text-xs text-gray-400 hover:text-red-500 transition-colors px-2 py-1 rounded border border-gray-200 hover:border-red-300 sm:hidden"
@@ -141,14 +174,14 @@ export default function App() {
           <div className="flex items-center justify-between sm:absolute sm:top-1/2 sm:-translate-y-1/2 sm:left-1/2 sm:-translate-x-1/2">
             <div className="flex items-center gap-1 bg-slate-100 rounded-xl px-2 py-1 mx-auto sm:mx-0">
               <button
-                onClick={() => setPeriod(prevPeriod)}
+                onClick={() => handlePeriodChange(prevPeriod(period))}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 transition-all text-sm font-bold"
               >‹</button>
               <span className="text-sm font-semibold text-gray-700 w-32 text-center">
                 {periodLabel(period)}
               </span>
               <button
-                onClick={() => setPeriod(nextPeriod)}
+                onClick={() => handlePeriodChange(nextPeriod(period))}
                 className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 transition-all text-sm font-bold"
               >›</button>
             </div>
