@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-const BASE = 'http://localhost:1337/api/mjesecni-troskovi'
+const BASE = 'http://localhost:1337/api/mjesecni-budget'
 
 export async function getTrosak(period) {
   const res = await axios.get(`${BASE}?filters[period][$eq]=${period}&pagination[pageSize]=1`)

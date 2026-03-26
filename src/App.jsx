@@ -4,7 +4,7 @@ import SubSection from './components/SubSection'
 import InputRow from './components/InputRow'
 import { getTrosak, saveTrosak } from './api'
 
-const STORAGE_KEY = 'troskovi_all'
+const STORAGE_KEY = 'budget_all'
 
 const MONTHS_HR = [
   'Siječanj','Veljača','Ožujak','Travanj','Svibanj','Lipanj',
@@ -138,14 +138,14 @@ export default function App() {
   const osobnoTotal    = n(v.os_odjeca) + n(v.os_kozmetika)
   const zabavaTotal    = n(v.zab_kave) + n(v.zab_ruckovi) + n(v.zab_izleti) + n(v.zab_ostalo)
 
-  const troskoviTotal =
+  const budgetTotal =
     domTotal + tekuceTotal + pretplateTotal + prijevozTotal +
     osobnoTotal + zabavaTotal +
     n(v.obrazovanje) + n(v.sport_zdravlje) + n(v.ostalo)
 
   const prometTotal   = n(v.pr_auto) + n(v.pr_gorivo) + n(v.pr_karta) + n(v.pr_taxi) + n(v.pr_drugo)
   const kreditiTotal  = n(v.kr_kredit) + n(v.kr_leasing) + n(v.kr_kartice) + n(v.kr_rate) + n(v.kr_zajmovi)
-  const ukupnoRashodi = troskoviTotal + prometTotal + kreditiTotal
+  const ukupnoRashodi = budgetTotal + prometTotal + kreditiTotal
   const prihodiTotal  = n(v.pi_placa) + n(v.pi_zarada) + n(v.pi_pasivni) + n(v.pi_stipendija) + n(v.pi_ostalo)
   const saldo         = prihodiTotal - ukupnoRashodi
 
@@ -196,7 +196,7 @@ export default function App() {
       <main className="max-w-2xl mx-auto px-4 py-5 space-y-4">
 
         {/* ─── TROŠKOVI ──────────────────────────────────────────────────── */}
-        <Card title="Troškovi" icon="💸" total={troskoviTotal} headerClass="bg-orange-50 text-orange-900">
+        <Card title="Troškovi" icon="💸" total={budgetTotal} headerClass="bg-orange-50 text-orange-900">
 
           <SubSection label="🏠 Dom" total={domTotal}
             labelClass="text-blue-600" boxClass="border-blue-100 bg-blue-50/40">
@@ -305,7 +305,7 @@ export default function App() {
             )}
             <Row label="Ukupni prihodi" value={fmt(prihodiTotal)} color="text-green-600" sign="+" />
             <div className="border-t border-gray-100 pt-2.5 space-y-2">
-              <Row label="Troškovi" value={fmt(troskoviTotal)} color="text-orange-500" sign="−" />
+              <Row label="Troškovi" value={fmt(budgetTotal)} color="text-orange-500" sign="−" />
               <Row label="Promet" value={fmt(prometTotal)} color="text-indigo-500" sign="−" />
               <Row label="Krediti" value={fmt(kreditiTotal)} color="text-red-500" sign="−" />
             </div>

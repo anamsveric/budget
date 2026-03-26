@@ -597,10 +597,10 @@ export interface ApiGlobalGlobal extends Struct.SingleTypeSchema {
 
 export interface ApiMjesecniTrosakMjesecniTrosak
   extends Struct.CollectionTypeSchema {
-  collectionName: 'mjesecni_troskovi';
+  collectionName: 'mjesecni_budget';
   info: {
     displayName: 'Mjese\u010Dni tro\u0161ak';
-    pluralName: 'mjesecni-troskovi';
+    pluralName: 'mjesecni-budget';
     singularName: 'mjesecni-trosak';
   };
   options: {
