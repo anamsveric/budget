@@ -52,7 +52,11 @@ function n(val) {
 }
 
 function fmt(val) {
-  return val.toLocaleString('hr-HR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  try {
+    return val.toLocaleString('hr-HR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  } catch {
+    return val.toFixed(2).replace('.', ',')
+  }
 }
 
 export default function App() {
@@ -64,7 +68,14 @@ export default function App() {
     } catch { return {} }
   })
   const [syncing, setSyncing] = useState(false)
+  const [showTop, setShowTop] = useState(false)
   const saveTimer = useRef(null)
+
+  useEffect(() => {
+    const onScroll = () => setShowTop(window.scrollY > 300)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
 
   // Učitaj podatke iz Strapi kad se promijeni period
   useEffect(() => {
@@ -172,17 +183,17 @@ export default function App() {
           </div>
           {/* Donji red na mobu / jedan red na desktopu */}
           <div className="flex items-center justify-between sm:absolute sm:top-1/2 sm:-translate-y-1/2 sm:left-1/2 sm:-translate-x-1/2">
-            <div className="flex items-center gap-1 bg-slate-100 rounded-xl px-2 py-1 mx-auto sm:mx-0">
+            <div className="flex items-center gap-1 bg-slate-100 rounded-xl px-1 py-1 mx-auto sm:mx-0">
               <button
                 onClick={() => handlePeriodChange(prevPeriod(period))}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 transition-all text-sm font-bold"
+                className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 active:bg-white transition-all text-lg sm:text-sm font-bold"
               >‹</button>
-              <span className="text-sm font-semibold text-gray-700 w-32 text-center">
+              <span className="text-sm font-semibold text-gray-700 w-32 text-center select-none">
                 {periodLabel(period)}
               </span>
               <button
                 onClick={() => handlePeriodChange(nextPeriod(period))}
-                className="w-7 h-7 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 transition-all text-sm font-bold"
+                className="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center rounded-lg text-gray-500 hover:bg-white hover:text-gray-900 active:bg-white transition-all text-lg sm:text-sm font-bold"
               >›</button>
             </div>
           </div>
@@ -380,6 +391,16 @@ export default function App() {
           </p>
         </footer>
       </main>
+
+      {showTop && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          className="fixed bottom-6 right-4 z-50 w-11 h-11 flex items-center justify-center rounded-full bg-white border border-gray-200 shadow-md text-gray-500 hover:text-gray-900 hover:shadow-lg active:scale-95 transition-all"
+          aria-label="Scroll to top"
+        >
+          ↑
+        </button>
+      )}
     </div>
   )
 }

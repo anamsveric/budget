@@ -3,16 +3,18 @@ import { useState } from 'react'
 export default function Card({ title, icon, total, headerClass, children, defaultOpen = false }) {
   const [open, setOpen] = useState(defaultOpen)
 
-  const formatted = total.toLocaleString('hr-HR', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })
+  let formatted
+  try {
+    formatted = total.toLocaleString('hr-HR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+  } catch {
+    formatted = total.toFixed(2).replace('.', ',')
+  }
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white shadow-sm overflow-hidden">
       <button
         onClick={() => setOpen(o => !o)}
-        className={`w-full flex items-center justify-between px-5 py-4 cursor-pointer transition-opacity hover:opacity-90 ${headerClass}`}
+        className={`w-full flex items-center justify-between px-5 py-4 cursor-pointer transition-opacity hover:opacity-90 active:opacity-75 min-h-14 ${headerClass}`}
       >
         <div className="flex items-center gap-2.5">
           <span className="text-xl">{icon}</span>

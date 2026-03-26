@@ -8,6 +8,12 @@ body {
   margin: 0;
   font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ukloni plavi flash na touch uređajima */
+button, a, input {
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Remove number input arrows */
@@ -16,4 +22,12 @@ input[type=number]::-webkit-outer-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }
-input[type=number] { -moz-appearance: textfield; }
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+/* Sprječava iOS Safari zoom na focus (font mora biti >= 16px) */
+input[type=date] {
+  font-size: 1rem;
+}

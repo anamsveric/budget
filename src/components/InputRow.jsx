@@ -10,7 +10,7 @@ export default function InputRow({ label, value, onChange, indent = false }) {
           value={value}
           onChange={onChange}
           placeholder="0"
-          className="w-32 text-right pr-7 pl-2 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all placeholder-gray-300"
+          className="w-28 sm:w-32 text-right pr-7 pl-2 py-1.5 rounded-lg border border-gray-200 bg-gray-50 text-gray-900 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all placeholder-gray-300"
         />
         <span className="absolute right-2.5 text-xs text-gray-400 pointer-events-none select-none">€</span>
       </div>
